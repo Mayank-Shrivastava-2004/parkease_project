@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import {
     Dimensions,
     FlatList,
+    ScrollView,
     StatusBar,
     Switch,
     Text,
@@ -112,35 +113,99 @@ export default function ProviderDashboardScreen() {
         </Animated.View>
     );
 
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'revenue':
+                return (
+                    <ScrollView className="flex-1 px-6 pt-24">
+                        <Text className="text-dark-900 font-bold text-xl mb-4">Revenue Breakdown</Text>
+                        <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
+                            <View className="flex-row justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                                <Text className="text-gray-500 font-medium">Daily Average</Text>
+                                <Text className="text-dark-900 font-bold text-lg">₹ 650</Text>
+                            </View>
+                            <View className="flex-row justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                                <Text className="text-gray-500 font-medium">Monthly Est.</Text>
+                                <Text className="text-dark-900 font-bold text-lg">₹ 19,500</Text>
+                            </View>
+                            <View className="flex-row justify-between items-center">
+                                <Text className="text-gray-500 font-medium">Platform Fee (15%)</Text>
+                                <Text className="text-red-500 font-bold">-₹ 675</Text>
+                            </View>
+                        </View>
+                    </ScrollView>
+                );
+            case 'ev':
+                return (
+                    <View className="flex-1 px-6 pt-24 items-center justify-center">
+                        <Ionicons name="flash-outline" size={64} color="#6C5CE7" />
+                        <Text className="text-xl font-bold text-dark-900 mt-4">EV Management</Text>
+                        <Text className="text-gray-500 text-center mt-2 px-10">Monitor and manage your EV charging stations here.</Text>
+                        <TouchableOpacity className="mt-6 bg-indigo-600 px-8 py-3 rounded-2xl">
+                            <Text className="text-white font-bold">Add New Charger</Text>
+                        </TouchableOpacity>
+                    </View>
+                );
+            case 'settings':
+                return (
+                    <ScrollView className="flex-1 px-6 pt-24">
+                        <Text className="text-dark-900 font-bold text-xl mb-4">Lot Settings</Text>
+                        <View className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
+                                <Ionicons name="time-outline" size={24} color="#636E72" />
+                                <Text className="ml-4 flex-1 font-bold text-dark-900">Operating Hours</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
+                                <Ionicons name="cash-outline" size={24} color="#636E72" />
+                                <Text className="ml-4 flex-1 font-bold text-dark-900">Pricing Rules</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="flex-row items-center p-4">
+                                <Ionicons name="business-outline" size={24} color="#636E72" />
+                                <Text className="ml-4 flex-1 font-bold text-dark-900">Business Profile</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                );
+            default:
+                return (
+                    <View className="flex-1 px-6 pt-24">
+                        <View className="flex-row justify-between items-center mb-6">
+                            <Text className="text-dark-900 font-bold text-lg">Slot Status</Text>
+                            <View className="flex-row items-center bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
+                                <Text className="text-xs font-bold text-gray-500 mr-2 uppercase">{isOnline ? 'Online' : 'Offline'}</Text>
+                                <Switch
+                                    value={isOnline}
+                                    onValueChange={setIsOnline}
+                                    trackColor={{ false: '#fab1a0', true: '#a29bfe' }}
+                                    thumbColor={isOnline ? '#6C5CE7' : '#f1f2f6'}
+                                    style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                                />
+                            </View>
+                        </View>
+
+                        <FlatList
+                            data={slots}
+                            renderItem={renderSlotItem}
+                            keyExtractor={item => item.id}
+                            numColumns={2}
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 100 }}
+                        />
+                    </View>
+                );
+        }
+    };
+
     return (
         <View className="flex-1 bg-provider-bg">
             <StatusBar barStyle="light-content" />
             {renderHeader()}
 
-            <View className="flex-1 px-6 pt-24">
-                <View className="flex-row justify-between items-center mb-6">
-                    <Text className="text-dark-900 font-bold text-lg">Slot Status</Text>
-                    <View className="flex-row items-center bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
-                        <Text className="text-xs font-bold text-gray-500 mr-2 uppercase">{isOnline ? 'Online' : 'Offline'}</Text>
-                        <Switch
-                            value={isOnline}
-                            onValueChange={setIsOnline}
-                            trackColor={{ false: '#fab1a0', true: '#a29bfe' }}
-                            thumbColor={isOnline ? '#6C5CE7' : '#f1f2f6'}
-                            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                        />
-                    </View>
-                </View>
+            {renderContent()}
 
-                <FlatList
-                    data={slots}
-                    renderItem={renderSlotItem}
-                    keyExtractor={item => item.id}
-                    numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                />
-            </View>
             <UnifiedSidebar
                 visible={showMenu}
                 onClose={() => setShowMenu(false)}

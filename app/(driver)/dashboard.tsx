@@ -77,7 +77,7 @@ export default function DriverDashboardScreen() {
                     <Text className="text-white/90 text-xs font-medium mb-1 uppercase tracking-wide">Wallet Balance</Text>
                     <Text className="text-white text-2xl font-bold">₹ 1,250.00</Text>
                 </View>
-                <TouchableOpacity className="bg-white px-5 py-2 rounded-xl shadow-sm">
+                <TouchableOpacity onPress={() => setActiveTab('wallet')} className="bg-white px-5 py-2 rounded-xl shadow-sm">
                     <Text className="text-teal-600 font-bold text-xs uppercase">Top Up</Text>
                 </TouchableOpacity>
             </View>
@@ -123,21 +123,101 @@ export default function DriverDashboardScreen() {
         </Animated.View>
     );
 
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'bookings':
+                return (
+                    <View className="flex-1 justify-center items-center px-6">
+                        <Ionicons name="ticket-outline" size={64} color="#00B894" />
+                        <Text className="text-xl font-bold text-dark-900 mt-4">My Bookings</Text>
+                        <Text className="text-gray-500 text-center mt-2 px-10">You don't have any active bookings yet. Explore nearby spots to book one!</Text>
+                        <TouchableOpacity
+                            onPress={() => setActiveTab('available')}
+                            className="mt-6 bg-teal-500 px-8 py-3 rounded-2xl"
+                        >
+                            <Text className="text-white font-bold">Explore Now</Text>
+                        </TouchableOpacity>
+                    </View>
+                );
+            case 'wallet':
+                return (
+                    <View className="flex-1 px-6 pt-6">
+                        <Text className="text-dark-900 font-bold text-xl mb-4">Wallet Transactions</Text>
+                        <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                            {[1, 2, 3].map((i) => (
+                                <View key={i} className="flex-row justify-between items-center py-4 border-b border-gray-50">
+                                    <View className="flex-row items-center">
+                                        <View className="w-10 h-10 bg-teal-50 rounded-full justify-center items-center mr-3">
+                                            <Ionicons name="arrow-up" size={20} color="#00B894" />
+                                        </View>
+                                        <View>
+                                            <Text className="font-bold text-dark-900">Wallet Top-up</Text>
+                                            <Text className="text-gray-400 text-xs">Oct {10 + i}, 2023</Text>
+                                        </View>
+                                    </View>
+                                    <Text className="text-teal-600 font-bold">+₹500</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                );
+            case 'profile':
+                return (
+                    <View className="flex-1 px-6 pt-6">
+                        <View className="items-center mb-8">
+                            <View className="w-24 h-24 bg-teal-100 rounded-full justify-center items-center mb-4">
+                                <Ionicons name="person" size={48} color="#00B894" />
+                            </View>
+                            <Text className="text-2xl font-bold text-dark-900">{currentUser.name}</Text>
+                            <Text className="text-gray-500 font-medium">{currentUser.email}</Text>
+                        </View>
+                        <View className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
+                                <View className="w-10 h-10 bg-gray-50 rounded-xl justify-center items-center mr-4">
+                                    <Ionicons name="car-outline" size={22} color="#636E72" />
+                                </View>
+                                <Text className="flex-1 font-bold text-dark-900">Vehicle Details</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
+                                <View className="w-10 h-10 bg-gray-50 rounded-xl justify-center items-center mr-4">
+                                    <Ionicons name="notifications-outline" size={22} color="#636E72" />
+                                </View>
+                                <Text className="flex-1 font-bold text-dark-900">Notification Settings</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                            <TouchableOpacity className="flex-row items-center p-4">
+                                <View className="w-10 h-10 bg-gray-50 rounded-xl justify-center items-center mr-4">
+                                    <Ionicons name="shield-checkmark-outline" size={22} color="#636E72" />
+                                </View>
+                                <Text className="flex-1 font-bold text-dark-900">Privacy & Security</Text>
+                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                );
+            default:
+                return (
+                    <View className="flex-1 px-6 pt-6">
+                        <Text className="text-dark-900 font-bold text-lg mb-4">Nearby Spots</Text>
+                        <FlatList
+                            data={parkingSlots}
+                            renderItem={renderSlotItem}
+                            keyExtractor={item => item.id}
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 150 }}
+                        />
+                    </View>
+                );
+        }
+    };
+
     return (
         <View className="flex-1 bg-driver-bg">
             <StatusBar barStyle="light-content" />
             {renderHeader()}
 
-            <View className="flex-1 px-6 pt-6">
-                <Text className="text-dark-900 font-bold text-lg mb-4">Nearby Spots</Text>
-                <FlatList
-                    data={parkingSlots}
-                    renderItem={renderSlotItem}
-                    keyExtractor={item => item.id}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                />
-            </View>
+            {renderContent()}
 
             {/* Bottom Floating Menu */}
             <View className="absolute bottom-8 left-6 right-6 bg-white rounded-2xl shadow-xl shadow-gray-200 p-2 flex-row justify-around items-center border border-gray-50">
@@ -156,11 +236,14 @@ export default function DriverDashboardScreen() {
                     {activeTab === 'bookings' && <Text className="text-[10px] font-bold text-teal-600 mt-1 uppercase">Bookings</Text>}
                 </TouchableOpacity>
                 <TouchableOpacity
-                    className="flex-1 py-3 items-center rounded-xl"
+                    onPress={() => setActiveTab('profile')}
+                    className={`flex-1 py-3 items-center rounded-xl ${activeTab === 'profile' ? 'bg-teal-50' : ''}`}
                 >
-                    <Ionicons name="settings-outline" size={24} color="#B2BEC3" />
+                    <Ionicons name="person" size={24} color={activeTab === 'profile' ? '#00B894' : '#B2BEC3'} />
+                    {activeTab === 'profile' && <Text className="text-[10px] font-bold text-teal-600 mt-1 uppercase">Profile</Text>}
                 </TouchableOpacity>
             </View>
+
             <UnifiedSidebar
                 visible={showMenu}
                 onClose={() => setShowMenu(false)}
