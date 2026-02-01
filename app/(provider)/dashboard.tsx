@@ -12,6 +12,7 @@ import {
     View
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import UnifiedSidebar from '../../components/shared/UnifiedSidebar';
 
 const { width } = Dimensions.get('window');
 
@@ -25,7 +26,15 @@ interface ParkingSlot {
 
 export default function ProviderDashboardScreen() {
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'slots' | 'revenue' | 'ev' | 'settings'>('slots');
+    const [showMenu, setShowMenu] = useState(false);
     const [isOnline, setIsOnline] = useState(true);
+    const [currentUser, setCurrentUser] = useState({
+        name: "Rajesh Kumar",
+        email: "rajesh@cityplaza.com",
+        phone: "+91 98765 43210",
+        roleTitle: "Landlord Partner"
+    });
 
     const slots: ParkingSlot[] = [
         { id: '1', code: 'A-01', isOccupied: true, earnings: 150, hours: 3 },
@@ -41,13 +50,21 @@ export default function ProviderDashboardScreen() {
             end={{ x: 1, y: 1 }}
             className="pt-16 pb-12 px-6 rounded-b-[40px] shadow-xl shadow-indigo-200"
         >
-            <View className="flex-row justify-between items-start mb-8">
-                <View>
-                    <Text className="text-indigo-100 font-bold tracking-widest text-[10px] uppercase mb-1">Provider Console</Text>
-                    <Text className="text-white text-3xl font-black">My Parking Lot</Text>
+            <View className="flex-row justify-between items-center mb-8">
+                <View className="flex-row items-center gap-4">
+                    <TouchableOpacity
+                        onPress={() => setShowMenu(true)}
+                        className="w-12 h-12 bg-white/20 rounded-2xl justify-center items-center backdrop-blur-sm border border-white/20"
+                    >
+                        <Ionicons name="menu" size={28} color="white" />
+                    </TouchableOpacity>
+                    <View>
+                        <Text className="text-indigo-100 font-bold tracking-widest text-[10px] uppercase mb-1">{currentUser.name}</Text>
+                        <Text className="text-white text-3xl font-black">My Parking Lot</Text>
+                    </View>
                 </View>
-                <TouchableOpacity onPress={() => router.back()} className="bg-white/20 p-2 rounded-xl backdrop-blur-md border border-white/20">
-                    <Ionicons name="power" size={20} color="white" />
+                <TouchableOpacity onPress={() => setShowMenu(true)} className="bg-white/20 p-2 rounded-xl backdrop-blur-md border border-white/20">
+                    <Ionicons name="person-outline" size={22} color="white" />
                 </TouchableOpacity>
             </View>
 
@@ -124,6 +141,16 @@ export default function ProviderDashboardScreen() {
                     contentContainerStyle={{ paddingBottom: 100 }}
                 />
             </View>
+            <UnifiedSidebar
+                visible={showMenu}
+                onClose={() => setShowMenu(false)}
+                role="provider"
+                userData={currentUser}
+                onUpdate={(name, phone) => setCurrentUser(prev => ({ ...prev, name, phone }))}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onLogout={() => router.back()}
+            />
         </View>
     );
 }

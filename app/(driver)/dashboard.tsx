@@ -11,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import UnifiedSidebar from '../../components/shared/UnifiedSidebar';
 
 interface ParkingSlot {
     id: string;
@@ -24,7 +25,14 @@ interface ParkingSlot {
 
 export default function DriverDashboardScreen() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'available' | 'bookings'>('available');
+    const [activeTab, setActiveTab] = useState<'available' | 'bookings' | 'wallet' | 'profile'>('available');
+    const [showMenu, setShowMenu] = useState(false);
+    const [currentUser, setCurrentUser] = useState({
+        name: "Alex Driver",
+        email: "alex.driver@gmail.com",
+        phone: "+91 88776 65544",
+        roleTitle: "Premium Partner"
+    });
 
     const parkingSlots: ParkingSlot[] = [
         { id: '1', name: 'City Center Hub', location: 'Downtown, Block A', price: 50, available: true, distance: '0.5 km', rating: 4.8 },
@@ -47,16 +55,19 @@ export default function DriverDashboardScreen() {
         >
             <View className="flex-row justify-between items-center mb-6">
                 <View className="flex-row items-center gap-3">
-                    <View className="w-12 h-12 bg-white/20 rounded-2xl justify-center items-center backdrop-blur-sm border border-white/20">
-                        <Ionicons name="person" size={24} color="white" />
-                    </View>
+                    <TouchableOpacity
+                        onPress={() => setShowMenu(true)}
+                        className="w-12 h-12 bg-white/20 rounded-2xl justify-center items-center backdrop-blur-sm border border-white/20"
+                    >
+                        <Ionicons name="menu" size={28} color="white" />
+                    </TouchableOpacity>
                     <View>
                         <Text className="text-white/80 text-[10px] font-bold tracking-widest uppercase">Welcome back</Text>
-                        <Text className="text-white text-xl font-bold">Alex Driver</Text>
+                        <Text className="text-white text-xl font-bold">{currentUser.name}</Text>
                     </View>
                 </View>
-                <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 bg-white/20 rounded-full justify-center items-center backdrop-blur-sm">
-                    <Ionicons name="log-out-outline" size={22} color="white" />
+                <TouchableOpacity onPress={() => setShowMenu(true)} className="w-10 h-10 bg-white/20 rounded-full justify-center items-center backdrop-blur-sm">
+                    <Ionicons name="person-outline" size={20} color="white" />
                 </TouchableOpacity>
             </View>
 
@@ -150,6 +161,16 @@ export default function DriverDashboardScreen() {
                     <Ionicons name="settings-outline" size={24} color="#B2BEC3" />
                 </TouchableOpacity>
             </View>
+            <UnifiedSidebar
+                visible={showMenu}
+                onClose={() => setShowMenu(false)}
+                role="driver"
+                userData={currentUser}
+                onUpdate={(name, phone) => setCurrentUser(prev => ({ ...prev, name, phone }))}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onLogout={() => router.back()}
+            />
         </View>
     );
 }
