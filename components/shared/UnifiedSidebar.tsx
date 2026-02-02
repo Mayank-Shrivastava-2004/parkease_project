@@ -50,7 +50,7 @@ export default function UnifiedSidebar({
         setEditPhone(userData.phone);
     }, [userData.name, userData.phone]);
 
-    const getThemeColors = () => {
+    const getThemeColors = (): [string, string] => {
         switch (role) {
             case 'admin': return ['#2D3436', '#636E72'];
             case 'driver': return ['#00B894', '#00cec9'];
@@ -87,9 +87,14 @@ export default function UnifiedSidebar({
             ];
         } else {
             return [
-                { id: 'slots', label: 'My Lots', icon: 'grid-outline' },
-                { id: 'revenue', label: 'Earnings', icon: 'cash-outline' },
+                { id: 'dashboard', label: 'Dashboard', icon: 'home-outline' },
+                { id: 'spaces', label: 'My Spaces', icon: 'grid-outline' },
+                { id: 'live', label: 'Live Traffic', icon: 'car-sport-outline' },
+                { id: 'bookings', label: 'History', icon: 'calendar-outline' },
+                { id: 'earnings', label: 'Earnings', icon: 'cash-outline' },
                 { id: 'ev', label: 'EV Station', icon: 'flash-outline' },
+                { id: 'messages', label: 'Admin Support', icon: 'headset-outline' },
+                { id: 'profile', label: 'My Profile', icon: 'person-outline' },
                 { id: 'settings', label: 'Lot Settings', icon: 'options-outline' },
             ];
         }

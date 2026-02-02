@@ -139,6 +139,23 @@ export default function UnifiedRegister({ role }: UnifiedRegisterProps) {
                             <>
                                 {renderInput('Parking Area Name', 'business-outline', formData.parkingAreaName, 'parkingAreaName')}
                                 {renderInput('Location', 'location-outline', formData.location, 'location')}
+                                {renderInput('Total Capacity (Slots)', 'grid-outline', '', 'capacity', false, 'numeric')}
+
+                                <View className="mb-4">
+                                    <Text className="text-[10px] text-gray-500 font-bold mb-2 uppercase tracking-widest ml-1">License Documents</Text>
+                                    <TouchableOpacity className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-300 items-center flex-row justify-center gap-2">
+                                        <Ionicons name="document-attach-outline" size={20} color="#6C5CE7" />
+                                        <Text className="text-gray-500 font-bold text-sm">Upload Business License</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <View className="mb-4">
+                                    <Text className="text-[10px] text-gray-500 font-bold mb-2 uppercase tracking-widest ml-1">Parking Lot Photos</Text>
+                                    <TouchableOpacity className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-300 items-center flex-row justify-center gap-2">
+                                        <Ionicons name="camera-outline" size={20} color="#6C5CE7" />
+                                        <Text className="text-gray-500 font-bold text-sm">Add Photos</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </>
                         )}
 

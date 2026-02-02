@@ -1,35 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Dimensions,
-    FlatList,
     ScrollView,
     StatusBar,
-    Switch,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import BookingHistory from '../../components/provider/BookingHistory';
+import EarningsTracker from '../../components/provider/EarningsTracker';
+import LiveStatus from '../../components/provider/LiveStatus';
+import ProviderProfile from '../../components/provider/ProviderProfile';
+import SpaceManagement from '../../components/provider/SpaceManagement';
 import UnifiedSidebar from '../../components/shared/UnifiedSidebar';
 
 const { width } = Dimensions.get('window');
 
-interface ParkingSlot {
-    id: string;
-    code: string;
-    isOccupied: boolean;
-    earnings: number;
-    hours: number;
-}
+type ProviderTab = 'dashboard' | 'spaces' | 'live' | 'bookings' | 'earnings' | 'profile' | 'messages' | 'ev' | 'settings';
 
 export default function ProviderDashboardScreen() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'slots' | 'revenue' | 'ev' | 'settings'>('slots');
+    const [activeTab, setActiveTab] = useState<ProviderTab>('dashboard');
     const [showMenu, setShowMenu] = useState(false);
-    const [isOnline, setIsOnline] = useState(true);
     const [currentUser, setCurrentUser] = useState({
         name: "Rajesh Kumar",
         email: "rajesh@cityplaza.com",
@@ -37,109 +31,102 @@ export default function ProviderDashboardScreen() {
         roleTitle: "Landlord Partner"
     });
 
-    const slots: ParkingSlot[] = [
-        { id: '1', code: 'A-01', isOccupied: true, earnings: 150, hours: 3 },
-        { id: '2', code: 'A-02', isOccupied: false, earnings: 450, hours: 9 },
-        { id: '3', code: 'B-01', isOccupied: true, earnings: 120, hours: 2.5 },
-        { id: '4', code: 'B-02', isOccupied: false, earnings: 0, hours: 0 },
-    ];
-
-    const renderHeader = () => (
-        <LinearGradient
-            colors={['#6C5CE7', '#a29bfe']} // Indigo Gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            className="pt-16 pb-12 px-6 rounded-b-[40px] shadow-xl shadow-indigo-200"
-        >
-            <View className="flex-row justify-between items-center mb-8">
-                <View className="flex-row items-center gap-4">
-                    <TouchableOpacity
-                        onPress={() => setShowMenu(true)}
-                        className="w-12 h-12 bg-white/20 rounded-2xl justify-center items-center backdrop-blur-sm border border-white/20"
-                    >
-                        <Ionicons name="menu" size={28} color="white" />
-                    </TouchableOpacity>
-                    <View>
-                        <Text className="text-indigo-100 font-bold tracking-widest text-[10px] uppercase mb-1">{currentUser.name}</Text>
-                        <Text className="text-white text-3xl font-black">My Parking Lot</Text>
-                    </View>
-                </View>
-                <TouchableOpacity onPress={() => setShowMenu(true)} className="bg-white/20 p-2 rounded-xl backdrop-blur-md border border-white/20">
-                    <Ionicons name="person-outline" size={22} color="white" />
-                </TouchableOpacity>
+    const renderDashboardSummary = () => (
+        <ScrollView className="flex-1 px-6 pt-24 pb-32" showsVerticalScrollIndicator={false}>
+            <View className="mb-8 mt-12">
+                <Text className="text-indigo-600 font-bold uppercase tracking-widest text-[10px] mb-1">Overview</Text>
+                <Text className="text-gray-900 text-3xl font-black">Dashboard</Text>
             </View>
 
-            <View className="bg-white rounded-3xl p-6 shadow-lg shadow-indigo-100 flex-row justify-between items-center -mb-20 border border-gray-50">
-                <View className="flex-1 border-r border-gray-100 pr-4">
-                    <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2">Total Revenue</Text>
-                    <Text className="text-3xl font-black text-dark-900">₹ 4,500</Text>
-                    <View className="flex-row items-center mt-1">
-                        <Ionicons name="trending-up" size={14} color="#00B894" />
-                        <Text className="text-teal-500 text-xs font-bold ml-1">+12% this week</Text>
-                    </View>
+            {/* Quick Stats Grid */}
+            <View className="flex-row flex-wrap justify-between mb-8">
+                <View className="bg-indigo-600 w-[48%] p-6 rounded-[32px] shadow-lg shadow-indigo-100 mb-4">
+                    <Ionicons name="wallet-outline" size={24} color="white" />
+                    <Text className="text-indigo-100 font-bold text-[10px] uppercase mt-4">Earnings Today</Text>
+                    <Text className="text-white text-2xl font-black">₹4,500</Text>
                 </View>
-                <View className="pl-4 items-center">
-                    <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2">Occupancy</Text>
-                    <View className="w-16 h-16 rounded-full border-4 border-indigo-100 justify-center items-center">
-                        <Text className="text-indigo-600 font-black text-lg">75%</Text>
-                    </View>
+                <View className="bg-white w-[48%] p-6 rounded-[32px] border border-gray-100 shadow-sm mb-4">
+                    <Ionicons name="car-outline" size={24} color="#6C5CE7" />
+                    <Text className="text-gray-400 font-bold text-[10px] uppercase mt-4">Active Cars</Text>
+                    <Text className="text-gray-900 text-2xl font-black">12/20</Text>
+                </View>
+                <View className="bg-white w-[48%] p-6 rounded-[32px] border border-gray-100 shadow-sm mb-4">
+                    <Ionicons name="star-outline" size={24} color="#FF9F43" />
+                    <Text className="text-gray-400 font-bold text-[10px] uppercase mt-4">Ratings</Text>
+                    <Text className="text-gray-900 text-2xl font-black">4.8/5.0</Text>
+                </View>
+                <View className="bg-indigo-50 w-[48%] p-6 rounded-[32px] border border-indigo-100 shadow-sm mb-4">
+                    <Ionicons name="flash-outline" size={24} color="#6C5CE7" />
+                    <Text className="text-indigo-600 font-bold text-[10px] uppercase mt-4">EV Usage</Text>
+                    <Text className="text-indigo-600 text-2xl font-black">85%</Text>
                 </View>
             </View>
-        </LinearGradient>
+
+            {/* Communication with Admin Card */}
+            <TouchableOpacity
+                onPress={() => setActiveTab('messages')}
+                className="bg-white rounded-[32px] p-6 mb-8 border border-indigo-100 shadow-sm flex-row items-center"
+            >
+                <View className="bg-indigo-100 w-12 h-12 rounded-2xl justify-center items-center">
+                    <Ionicons name="headset-outline" size={24} color="#6C5CE7" />
+                </View>
+                <View className="ml-4 flex-1">
+                    <Text className="text-gray-900 font-black text-lg">Support Center</Text>
+                    <Text className="text-gray-400 font-bold text-xs">Chat directly with the Admin</Text>
+                </View>
+                <View className="w-6 h-6 bg-red-500 rounded-full justify-center items-center">
+                    <Text className="text-white text-[10px] font-bold">1</Text>
+                </View>
+            </TouchableOpacity>
+
+            <Text className="text-gray-900 font-black text-xl mb-6">Today's Activity</Text>
+            {[1, 2, 3].map((_, i) => (
+                <View key={i} className="bg-white rounded-3xl p-5 mb-4 border border-gray-50 flex-row items-center">
+                    <View className="w-10 h-10 bg-gray-50 rounded-xl justify-center items-center mr-4">
+                        <Ionicons name="time-outline" size={20} color="#9CA3AF" />
+                    </View>
+                    <View className="flex-1">
+                        <Text className="text-gray-900 font-bold">Booking #{1024 + i}</Text>
+                        <Text className="text-gray-400 text-xs">2 hours ago • Slot A{i + 1}</Text>
+                    </View>
+                    <Text className="text-indigo-600 font-black">+₹150</Text>
+                </View>
+            ))}
+        </ScrollView>
     );
 
-    const renderSlotItem = ({ item, index }: { item: ParkingSlot; index: number }) => (
-        <Animated.View
-            entering={FadeInDown.delay(index * 100).springify()}
-            style={{ width: (width - 48) / 2 }}
-            className={`bg-white rounded-2xl p-4 mb-4 shadow-sm shadow-gray-200 border border-gray-50 ${index % 2 === 0 ? 'mr-4' : ''}`}
-        >
-            <View className="flex-row justify-between items-center mb-4">
-                <View className={`w-10 h-10 rounded-xl justify-center items-center ${item.isOccupied ? 'bg-red-50' : 'bg-green-50'}`}>
-                    <Text className={`font-black text-sm ${item.isOccupied ? 'text-red-500' : 'text-green-500'}`}>{item.code}</Text>
-                </View>
-                <View className={`w-2 h-2 rounded-full ${item.isOccupied ? 'bg-red-500' : 'bg-green-500'}`} />
+    const renderSupport = () => (
+        <View className="flex-1 px-6 pt-24 items-center justify-center">
+            <View className="w-24 h-24 bg-indigo-50 rounded-[40px] justify-center items-center mb-6">
+                <Ionicons name="chatbubbles-outline" size={48} color="#6C5CE7" />
             </View>
-
-            <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wide mb-1">{item.isOccupied ? 'Occupied' : 'Vacant'}</Text>
-            {item.isOccupied ? (
-                <View>
-                    <Text className="text-dark-900 font-bold text-lg">₹ {item.earnings}</Text>
-                    <Text className="text-xs text-indigo-500 font-bold">{item.hours} hrs active</Text>
-                </View>
-            ) : (
-                <Text className="text-gray-300 font-bold text-lg">---</Text>
-            )}
-        </Animated.View>
+            <Text className="text-2xl font-black text-gray-900 text-center">Admin Support</Text>
+            <Text className="text-gray-500 text-center mt-2 px-10">Have a question or issue? Start a conversation with our admin team.</Text>
+            <TouchableOpacity className="mt-10 bg-indigo-600 px-12 py-5 rounded-[24px] shadow-xl shadow-indigo-200">
+                <Text className="text-white font-black uppercase tracking-wider">Start Chat</Text>
+            </TouchableOpacity>
+        </View>
     );
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'revenue':
-                return (
-                    <ScrollView className="flex-1 px-6 pt-24">
-                        <Text className="text-dark-900 font-bold text-xl mb-4">Revenue Breakdown</Text>
-                        <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
-                            <View className="flex-row justify-between items-center mb-4 pb-4 border-b border-gray-50">
-                                <Text className="text-gray-500 font-medium">Daily Average</Text>
-                                <Text className="text-dark-900 font-bold text-lg">₹ 650</Text>
-                            </View>
-                            <View className="flex-row justify-between items-center mb-4 pb-4 border-b border-gray-50">
-                                <Text className="text-gray-500 font-medium">Monthly Est.</Text>
-                                <Text className="text-dark-900 font-bold text-lg">₹ 19,500</Text>
-                            </View>
-                            <View className="flex-row justify-between items-center">
-                                <Text className="text-gray-500 font-medium">Platform Fee (15%)</Text>
-                                <Text className="text-red-500 font-bold">-₹ 675</Text>
-                            </View>
-                        </View>
-                    </ScrollView>
-                );
+            case 'spaces':
+                return <SpaceManagement />;
+            case 'live':
+                return <LiveStatus />;
+            case 'bookings':
+                return <BookingHistory />;
+            case 'earnings':
+                return <EarningsTracker />;
+            case 'profile':
+                return <ProviderProfile />;
+            case 'messages':
+                return renderSupport();
             case 'ev':
                 return (
                     <View className="flex-1 px-6 pt-24 items-center justify-center">
                         <Ionicons name="flash-outline" size={64} color="#6C5CE7" />
-                        <Text className="text-xl font-bold text-dark-900 mt-4">EV Management</Text>
+                        <Text className="text-xl font-bold text-gray-900 mt-4">EV Management</Text>
                         <Text className="text-gray-500 text-center mt-2 px-10">Monitor and manage your EV charging stations here.</Text>
                         <TouchableOpacity className="mt-6 bg-indigo-600 px-8 py-3 rounded-2xl">
                             <Text className="text-white font-bold">Add New Charger</Text>
@@ -148,61 +135,55 @@ export default function ProviderDashboardScreen() {
                 );
             case 'settings':
                 return (
-                    <ScrollView className="flex-1 px-6 pt-24">
-                        <Text className="text-dark-900 font-bold text-xl mb-4">Lot Settings</Text>
+                    <ScrollView className="flex-1 px-6 pt-32 pb-32">
+                        <Text className="text-gray-900 font-bold text-xl mb-6">Lot Settings</Text>
                         <View className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
-                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
-                                <Ionicons name="time-outline" size={24} color="#636E72" />
-                                <Text className="ml-4 flex-1 font-bold text-dark-900">Operating Hours</Text>
-                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
-                            </TouchableOpacity>
-                            <TouchableOpacity className="flex-row items-center p-4 border-b border-gray-50">
-                                <Ionicons name="cash-outline" size={24} color="#636E72" />
-                                <Text className="ml-4 flex-1 font-bold text-dark-900">Pricing Rules</Text>
-                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
-                            </TouchableOpacity>
-                            <TouchableOpacity className="flex-row items-center p-4">
-                                <Ionicons name="business-outline" size={24} color="#636E72" />
-                                <Text className="ml-4 flex-1 font-bold text-dark-900">Business Profile</Text>
-                                <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
-                            </TouchableOpacity>
+                            {[
+                                { icon: 'time-outline', label: 'Operating Hours' },
+                                { icon: 'cash-outline', label: 'Pricing Rules' },
+                                { icon: 'business-outline', label: 'Business Profile' },
+                                { icon: 'notifications-outline', label: 'Notification Settings' },
+                            ].map((item, i) => (
+                                <TouchableOpacity key={i} className={`flex-row items-center p-4 ${i !== 3 ? 'border-b border-gray-50' : ''}`}>
+                                    <Ionicons name={item.icon as any} size={24} color="#636E72" />
+                                    <Text className="ml-4 flex-1 font-bold text-gray-900">{item.label}</Text>
+                                    <Ionicons name="chevron-forward" size={18} color="#B2BEC3" />
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </ScrollView>
                 );
+            case 'dashboard':
             default:
-                return (
-                    <View className="flex-1 px-6 pt-24">
-                        <View className="flex-row justify-between items-center mb-6">
-                            <Text className="text-dark-900 font-bold text-lg">Slot Status</Text>
-                            <View className="flex-row items-center bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
-                                <Text className="text-xs font-bold text-gray-500 mr-2 uppercase">{isOnline ? 'Online' : 'Offline'}</Text>
-                                <Switch
-                                    value={isOnline}
-                                    onValueChange={setIsOnline}
-                                    trackColor={{ false: '#fab1a0', true: '#a29bfe' }}
-                                    thumbColor={isOnline ? '#6C5CE7' : '#f1f2f6'}
-                                    style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                                />
-                            </View>
-                        </View>
-
-                        <FlatList
-                            data={slots}
-                            renderItem={renderSlotItem}
-                            keyExtractor={item => item.id}
-                            numColumns={2}
-                            showsVerticalScrollIndicator={false}
-                            contentContainerStyle={{ paddingBottom: 100 }}
-                        />
-                    </View>
-                );
+                return renderDashboardSummary();
         }
     };
 
     return (
-        <View className="flex-1 bg-provider-bg">
-            <StatusBar barStyle="light-content" />
-            {renderHeader()}
+        <View className="flex-1 bg-white">
+            <StatusBar barStyle="dark-content" />
+
+            {/* Minimal Header with Toggle */}
+            <View className="absolute top-0 left-0 right-0 z-50 flex-row justify-between items-center px-6 pt-12 pb-4 bg-white/80 backdrop-blur-md">
+                <TouchableOpacity
+                    onPress={() => setShowMenu(true)}
+                    className="w-12 h-12 bg-indigo-50 rounded-2xl justify-center items-center"
+                >
+                    <Ionicons name="menu" size={28} color="#6C5CE7" />
+                </TouchableOpacity>
+                <View className="items-center">
+                    <Text className="text-indigo-600 font-black text-xl tracking-tighter">ParkEase</Text>
+                    <Text className="text-gray-400 font-bold text-[8px] uppercase tracking-widest">Provider Hub</Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => setActiveTab('profile')}
+                    className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-indigo-100"
+                >
+                    <View className="w-full h-full bg-indigo-50 items-center justify-center">
+                        <Text className="text-indigo-600 font-black">RK</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
 
             {renderContent()}
 
@@ -212,9 +193,9 @@ export default function ProviderDashboardScreen() {
                 role="provider"
                 userData={currentUser}
                 onUpdate={(name, phone) => setCurrentUser(prev => ({ ...prev, name, phone }))}
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                onLogout={() => router.back()}
+                activeTab={activeTab as any}
+                onTabChange={setActiveTab as any}
+                onLogout={() => router.replace('/(provider)')}
             />
         </View>
     );
